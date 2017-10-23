@@ -10,9 +10,6 @@ UOpenDoor::UOpenDoor()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// find the owning actor
-	AActor *Owner = GetOwner();
 }
 
 
@@ -24,7 +21,7 @@ void UOpenDoor::BeginPlay()
 	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 
 	// find the owning actor
-	AActor *Owner = GetOwner();
+	Owner = GetOwner();
 
 	// Get the objects name to dispaly in the string...
 	FString objectName = Owner->GetName();
@@ -38,37 +35,54 @@ void UOpenDoor::BeginPlay()
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	try {
+		// Is the actor over within the Trigger?
+		if (PressurePlate != nullptr && ActorThatOpens != nullptr && PressurePlate->IsOverlappingActor(ActorThatOpens))
+		{
+			// IS the Pawn on the pressure plate?
+			OpenDoor(true);
+			LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+		}
 
-	// Is the actor over within the Trigger?
-	if (PressurePlate && ActorThatOpens && PressurePlate->IsOverlappingActor(ActorThatOpens))
-	{
-		// IS the Pawn on the pressure plate?
-		OpenDoor(true);
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
-	} 
-
-	// Check if the door should be closed?
-	if (LastDoorOpenTime + DoorCloseDelay < GetWorld()->GetTimeSeconds())
-	{
-		OpenDoor(false);
+		// Check if the door should be closed?
+		if (LastDoorOpenTime + DoorCloseDelay < GetWorld()->GetTimeSeconds())
+		{
+			OpenDoor(false);
+		}
 	}
-
+	catch (...)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Tick threw an exception of some sort\n"));
+	}
 }
 
 void UOpenDoor::OpenDoor(bool Open)
 {
-	// Create a FRotator	
-	FRotator objectRotator = FRotator(0.0f, 0.0f, 0.0f);
-
-	// Are we opening the door?
-	if (Open)
+	try
 	{
-		// DoorCurrentAngle++;
-		objectRotator = FRotator(0.0f, OpenAngle, 0.0f);
+		// Create a FRotator	
+		FRotator objectRotator = FRotator(0.0f, 0.0f, 0.0f);
+
+		// Are we opening the door?
+		if (Open)
+		{
+			if(DoorCurrentAngle < OpenAngle)
+				DoorCurrentAngle++;
+		}
+		else
+		{
+			if (DoorCurrentAngle > 0)
+				DoorCurrentAngle--;
+		}
+		objectRotator = FRotator(0.0f, DoorCurrentAngle, 0.0f);
+
+		// set the rotation
+		if(Owner != nullptr)
+			Owner->SetActorRotation(objectRotator, ETeleportType::None);
 	}
-
-	// set the rotation
-	Owner->SetActorRotation(objectRotator, ETeleportType::None);
-
+	catch(...)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Open Door threw an exception of some sort\n"));
+	}
 }
 
