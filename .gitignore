@@ -14,3 +14,4 @@ BuildingEscape/Content/StarterContent/
 *.VC.db
 *.VC.opendb
 *.sln
+/BuildingEscape/.vs/BuildingEscape/v15/ipch/AutoPCH/9d9dfd8b016a28b2

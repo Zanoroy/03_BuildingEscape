@@ -3,6 +3,7 @@
 #include "OpenDoor.h"
 #include "GameFramework/Actor.h"
 #include "Engine/World.h"
+#include "Components/PrimitiveComponent.h"
 
 #define OUT
 
@@ -37,7 +38,10 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	try {
 		// Is the actor over within the Trigger?
-		if (GetTotalMassOnPlate() > 50)
+		float TotalMass = GetTotalMassOnPlate();
+		UE_LOG(LogTemp, Error, TEXT("Total Mass: %f on plate, Mass required: %f\n"), TotalMass, TriggerMass);
+
+		if (TotalMass > TriggerMass)
 		{
 			// IS the Pawn on the pressure plate?
 			OpenDoor(true);
@@ -62,18 +66,11 @@ float UOpenDoor::GetTotalMassOnPlate()
 	PressurePlate->GetOverlappingActors(OUT OverloadingActors);
 	float TotalMass = 0;
 	
-	for (const auto* actor : OverloadingActors)
+	for (AActor* Actor : OverloadingActors)
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s is on plate\n"), *actor->GetName());
-		
-		// UPrimitiveComponent* primComponent = actor->FindComponentByClass<UPrimitiveComponent>();
-		//if (primComponent)
-		//{
-		//	primComponent->GetMass();
-		//}
-		TotalMass += 0;
+		TotalMass += Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+		UE_LOG(LogTemp, Error, TEXT("%s is on plate\n"), *Actor->GetName());
 	}
-
 
 	return TotalMass;
 }

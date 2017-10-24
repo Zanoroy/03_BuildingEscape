@@ -34,10 +34,10 @@ private:
 	ATriggerVolume* PressurePlate;
 	
 	UPROPERTY(EditAnywhere)
-	float DoorCloseDelay = 0.5f;
+	float DoorCloseDelay = 0.3f;
 
 	UPROPERTY(EditAnywhere)
-	float TriggerMass = 50.0f;
+	float TriggerMass = 40.0f;
 
 	float LastDoorOpenTime;
 	AActor *Owner;
