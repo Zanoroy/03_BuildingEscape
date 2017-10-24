@@ -12,3 +12,5 @@ BuildingEscape/Content/StarterContent/
 # VS Generated files #
 ######################
 *.VC.db
+*.VC.opendb
+*.sln

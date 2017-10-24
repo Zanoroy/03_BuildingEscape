@@ -44,6 +44,10 @@ private:
 	// Setup (assumed) attached physic handle component
 	void SetupInputComponent();
 
+	/// Find the end point of our Reach
+	FVector GetReachPointStart();
+	FVector GetReachPointEnd();
+
 	// Return get first hit physics body within reach
 	const FHitResult GetFirstPhysicsbodyWithinReach();
 
