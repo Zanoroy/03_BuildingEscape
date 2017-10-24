@@ -4,6 +4,8 @@
 #include "GameFramework/Actor.h"
 #include "Engine/World.h"
 
+#define OUT
+
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
 {
@@ -17,8 +19,6 @@ UOpenDoor::UOpenDoor()
 void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 
 	// find the owning actor
 	Owner = GetOwner();
@@ -37,7 +37,7 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	try {
 		// Is the actor over within the Trigger?
-		if (PressurePlate != nullptr && ActorThatOpens != nullptr && PressurePlate->IsOverlappingActor(ActorThatOpens))
+		if (GetTotalMassOnPlate() > 50)
 		{
 			// IS the Pawn on the pressure plate?
 			OpenDoor(true);
@@ -54,6 +54,28 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	{
 		UE_LOG(LogTemp, Error, TEXT("Tick threw an exception of some sort\n"));
 	}
+}
+
+float UOpenDoor::GetTotalMassOnPlate()
+{
+	TArray<AActor*> OverloadingActors;
+	PressurePlate->GetOverlappingActors(OUT OverloadingActors);
+	float TotalMass = 0;
+	
+	for (const auto* actor : OverloadingActors)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s is on plate\n"), *actor->GetName());
+		
+		// UPrimitiveComponent* primComponent = actor->FindComponentByClass<UPrimitiveComponent>();
+		//if (primComponent)
+		//{
+		//	primComponent->GetMass();
+		//}
+		TotalMass += 0;
+	}
+
+
+	return TotalMass;
 }
 
 void UOpenDoor::OpenDoor(bool Open)
